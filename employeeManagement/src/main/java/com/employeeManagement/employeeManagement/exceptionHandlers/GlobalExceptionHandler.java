@@ -24,15 +24,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
 
-        // Create a map to store field names and their corresponding error messages
         Map<String, String> fieldErrors = new HashMap<>();
 
-        // Extract and map error messages for specific fields
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             fieldErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
-        // Construct a custom error response
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("message", "Validation error");
         errorResponse.put("errors", fieldErrors);
@@ -46,7 +43,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         String errorMessage = ex.getMessage();
 
-        // Construct a custom error response for HttpMessageNotReadableException
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("message", "Request body format error");
         errorResponse.put("error", errorMessage);
@@ -60,7 +56,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> resourseNotFoundException(ResourceNotFoundException ex) {
         String errorMessage = ex.getMessage();
 
-        // Construct a custom error response for HttpMessageNotReadableException
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("message", "Request body format error");
         errorResponse.put("error", errorMessage);
@@ -74,7 +69,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleEmployeeIsAssignedException(ExceptionUtils.EmployeeIsAssignedException ex) {
         String errorMessage = ex.getMessage();
 
-        // Construct a custom error response
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("message", "Employee assignment error");
         errorResponse.put("error", errorMessage);

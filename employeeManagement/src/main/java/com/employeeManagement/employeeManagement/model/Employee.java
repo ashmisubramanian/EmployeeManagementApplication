@@ -2,14 +2,10 @@ package com.employeeManagement.employeeManagement.model;
 
 import com.employeeManagement.employeeManagement.enumModel.Role;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,7 +16,6 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-//@Builder
 @Table(name = "employee")
 @Getter
 @Setter

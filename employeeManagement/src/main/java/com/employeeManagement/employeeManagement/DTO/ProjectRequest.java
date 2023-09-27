@@ -1,7 +1,6 @@
 package com.employeeManagement.employeeManagement.DTO;
 
 import com.employeeManagement.employeeManagement.enumModel.ProjectStatus;
-import com.employeeManagement.employeeManagement.model.Employee;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

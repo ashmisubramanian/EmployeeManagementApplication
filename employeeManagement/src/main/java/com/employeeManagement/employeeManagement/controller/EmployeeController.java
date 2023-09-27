@@ -1,18 +1,15 @@
 package com.employeeManagement.employeeManagement.controller;
 
 import com.employeeManagement.employeeManagement.DTO.EmployeeResponse;
-import com.employeeManagement.employeeManagement.DTO.ProjectRequest;
 import com.employeeManagement.employeeManagement.enumModel.Role;
 import com.employeeManagement.employeeManagement.exceptionHandlers.ExceptionUtils;
 import com.employeeManagement.employeeManagement.model.Employee;
-import com.employeeManagement.employeeManagement.model.Project;
 import com.employeeManagement.employeeManagement.repository.EmployeeRepository;
 import com.employeeManagement.employeeManagement.repository.ProjectRepository;
 import com.employeeManagement.employeeManagement.security.AuthenticationService;
 import com.employeeManagement.employeeManagement.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/employee")
@@ -68,7 +64,6 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getEmployeeById(employee.getId()));
     }
 
-    //@PreAuthorize("hasRole('ADMIN') or (hasRole('USER') and principal.username == @employeeRepository.findById(#id).orElse(new com.example.Employee()).getUsername())")
     @PreAuthorize("(hasAuthority('ADMIN') or (hasAuthority('USER') and principal.username==@authenticationService.userNameForId(#id)))")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateProject(@PathVariable Long id,@Valid @RequestBody Employee updateEmployee) {

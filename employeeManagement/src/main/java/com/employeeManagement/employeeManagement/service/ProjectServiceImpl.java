@@ -39,9 +39,8 @@ public class ProjectServiceImpl implements ProjectService{
 
         List<Long> employeeIds = projectRequest.getEmployeeIds();
 
-        // Find and set the employees using employeeIds from the request
         List<Employee> employees = employeeRepository.findAllById(employeeIds);
-        // Collect missing employee IDs
+
         List<Long> missingEmployeeIds = employeeIds.stream()
                 .filter(id -> employees.stream().noneMatch(employee -> employee.getId().equals(id)))
                 .collect(Collectors.toList());
@@ -52,7 +51,6 @@ public class ProjectServiceImpl implements ProjectService{
 
         project.setEmployee(employees);
 
-        // Set the status from the request
         project.setStatus(ProjectStatus.TODO);
 
         Project savedProject = projectRepository.save(project);
@@ -107,6 +105,15 @@ public class ProjectServiceImpl implements ProjectService{
         List<Long> employeeIds = projectRequest.getEmployeeIds();
 
         List<Employee> employees = employeeRepository.findAllById(employeeIds);
+
+        List<Long> missingEmployeeIds = employeeIds.stream()
+                .filter(id -> employees.stream().noneMatch(employee -> employee.getId().equals(id)))
+                .collect(Collectors.toList());
+
+        if (!missingEmployeeIds.isEmpty()) {
+            throw new ResourceNotFoundException("Employee(s) with IDs " + missingEmployeeIds + " not found");
+        }
+
         project.setEmployee(employees);
         project.setStatus(projectRequest.getStatus());
         return project;
