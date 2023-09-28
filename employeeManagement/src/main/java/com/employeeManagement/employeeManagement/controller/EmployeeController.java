@@ -8,6 +8,11 @@ import com.employeeManagement.employeeManagement.repository.EmployeeRepository;
 import com.employeeManagement.employeeManagement.repository.ProjectRepository;
 import com.employeeManagement.employeeManagement.security.AuthenticationService;
 import com.employeeManagement.employeeManagement.service.EmployeeService;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +28,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/employee")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Employee Management")
 public class EmployeeController {
 
     @Autowired
@@ -40,12 +47,54 @@ public class EmployeeController {
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Autowired
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
 
-    @GetMapping
+
+    @Operation(
+            description = "GET endpoint for Employee",
+            summary = "GET endpoint to retrieve all employees information",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Bad Request",
+                            responseCode = "400"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized / Invalid Token",
+                            responseCode = "403"
+                    )
+            }
+    )
+    @GetMapping("/")
     public @ResponseBody List<EmployeeResponse> getEmployees(){
         return employeeService.getEmployees();
     }
 
+
+    @Operation(
+            description = "GET endpoint for Employee",
+            summary = "GET endpoint to retrieve an employee by id",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Bad Request",
+                            responseCode = "400"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized / Invalid Token",
+                            responseCode = "403"
+                    )
+            }
+    )
     @GetMapping(params = "id")
     public @ResponseBody ResponseEntity<EmployeeResponse> findEmployeeById(@RequestParam(name = "id") Long id){
         EmployeeResponse employeeResponse=employeeService.getEmployeeById(id);
@@ -55,8 +104,28 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(employeeResponse);
     }
 
+
+    @Operation(
+            description = "POST endpoint for Employee",
+            summary = "POST endpoint to add an employee",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Bad Request",
+                            responseCode = "400"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized / Invalid Token",
+                            responseCode = "403"
+                    )
+            }
+    )
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
+    @Hidden
     public ResponseEntity<EmployeeResponse> saveEmployee(@Valid @RequestBody Employee saveEmployee){
         saveEmployee.setPassword(passwordEncoder.encode(saveEmployee.getPassword()));
         saveEmployee.setRole(Role.USER);
@@ -64,6 +133,25 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getEmployeeById(employee.getId()));
     }
 
+
+    @Operation(
+            description = "PUT endpoint for Employee",
+            summary = "PUT endpoint to update an employee",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Bad Request",
+                            responseCode = "400"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized / Invalid Token",
+                            responseCode = "403"
+                    )
+            }
+    )
     @PreAuthorize("(hasAuthority('ADMIN') or (hasAuthority('USER') and principal.username==@authenticationService.userNameForId(#id)))")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateProject(@PathVariable Long id,@Valid @RequestBody Employee updateEmployee) {
@@ -90,8 +178,28 @@ public class EmployeeController {
         }
     }
 
+
+    @Operation(
+            description = "DELETE endpoint for Employee",
+            summary = "DELETE endpoint to delete an employee",
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200"
+                    ),
+                    @ApiResponse(
+                            description = "Bad Request",
+                            responseCode = "400"
+                    ),
+                    @ApiResponse(
+                            description = "Unauthorized / Invalid Token",
+                            responseCode = "403"
+                    )
+            }
+    )
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
+    @Hidden
     public ResponseEntity<String> deleteEmployee(@PathVariable Long id){
         Optional<Employee> employee= employeeRepository.findById(id);
         if(employee.isPresent()){

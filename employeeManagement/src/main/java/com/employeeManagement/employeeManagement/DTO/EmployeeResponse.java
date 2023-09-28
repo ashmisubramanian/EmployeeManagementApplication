@@ -9,6 +9,15 @@ public class EmployeeResponse {
     private String email;
     private Role role;
 
+    public EmployeeResponse(long id, String firstName, String lastName, String email, Role role) {
+        this.id=id;
+        this.firstName=firstName;
+        this.lastName=lastName;
+        this.email=email;
+        this.role=role;
+    }
+    public EmployeeResponse(){}
+
     public Long getId() {
         return id;
     }
