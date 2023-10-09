@@ -10,6 +10,8 @@ import com.employeeManagement.employeeManagement.repository.EmployeeRepository;
 import com.employeeManagement.employeeManagement.repository.ProjectRepository;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -117,6 +119,44 @@ public class ProjectServiceImpl implements ProjectService{
         project.setEmployee(employees);
         project.setStatus(projectRequest.getStatus());
         return project;
+    }
+
+    @Override
+    public ResponseEntity<String> deleteProjectById(Long id) {
+        Optional<Project> projectOptional = projectRepository.findById(id);
+
+        if (projectOptional.isPresent()) {
+            projectRepository.deleteById(id);
+            return ResponseEntity.ok("Project with ID " + id + " deleted");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Project with ID " + id + " doesn't exist");
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> deleteEmployeeFromProjects(Long id) {
+        Employee employeeFounded = employeeRepository.getReferenceById(id);
+        List<Project> projects = projectRepository.findByEmployee(employeeFounded);
+
+        if (!projects.isEmpty()) {
+            for (Project project : projects) {
+                List<Employee> employees = project.getEmployee();
+                Employee employee = employees.stream()
+                        .filter(e -> e.getId().equals(id))
+                        .findFirst()
+                        .orElse(null);
+
+                if (employee != null) {
+                    employees.remove(employee);
+                    project.setEmployee(employees);
+                    projectRepository.saveAndFlush(project);
+                }
+            }
+            return ResponseEntity.ok("Employee removed from projects.");
+        } else {
+            return ResponseEntity.ok("Employee is not present in any projects.");
+        }
     }
 
 

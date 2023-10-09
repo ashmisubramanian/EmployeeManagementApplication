@@ -57,7 +57,7 @@ public class ProjectController {
             }
     )
     @GetMapping("/")
-    public @ResponseBody List<ProjectResponse> getEmployees(){
+    public @ResponseBody List<ProjectResponse> getProjects(){
         return projectService.getProjects();
     }
 
@@ -81,7 +81,7 @@ public class ProjectController {
             }
     )
     @GetMapping(params = "id")
-    public @ResponseBody ResponseEntity<ProjectResponse> findEmployeeById(@RequestParam(name = "id") Long id){
+    public @ResponseBody ResponseEntity<ProjectResponse> findProjectById(@RequestParam(name = "id") Long id){
         ProjectResponse projectResponse=projectService.getProjectById(id);
         if(projectResponse!=null){
             return ResponseEntity.ok(projectResponse);
@@ -176,15 +176,7 @@ public class ProjectController {
     @DeleteMapping("/{id}")
     @Hidden
     public ResponseEntity<String> deleteProject(@PathVariable Long id){
-        Optional<Project> project= projectRepository.findById(id);
-        if(project.isPresent()){
-            projectRepository.deleteById(id);
-            return ResponseEntity.ok("Project with Id{"+id+"} deleted");
-        }
-        else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Project with Id {"+id+"} doesn't exist");
-        }
+        return projectService.deleteProjectById(id);
     }
 
 
@@ -210,27 +202,7 @@ public class ProjectController {
     @DeleteMapping("/removeEmployeeFromProjects/{id}")
     @Hidden
     public ResponseEntity<String> deleteEmployeeFromProject(@PathVariable Long id){
-        Employee employeeFounded=employeeRepository.getReferenceById(id);
-        List<Project> projects=projectRepository.findByEmployee(employeeFounded);
-        if (!projects.isEmpty()) {
-            for (Project project:projects) {
-                List<Employee> employees = project.getEmployee();
-                Employee employee = employees.stream()
-                        .filter(e -> e.getId().equals(id))
-                        .findFirst()
-                        .orElse(null);
-
-                if (employee != null) {
-                    employees.remove(employee);
-                    project.setEmployee(employees);
-                    projectRepository.saveAndFlush(project);
-                }
-            }
-            return ResponseEntity.ok("Employee removed from projects.");
-        }
-        else {
-            return ResponseEntity.ok("Employee is not present in any projects.");
-        }
+        return projectService.deleteEmployeeFromProjects(id);
     }
 
 

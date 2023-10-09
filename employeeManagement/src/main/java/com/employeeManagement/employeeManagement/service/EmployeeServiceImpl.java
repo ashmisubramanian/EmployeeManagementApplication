@@ -1,11 +1,13 @@
 package com.employeeManagement.employeeManagement.service;
 
 import com.employeeManagement.employeeManagement.DTO.EmployeeResponse;
+import com.employeeManagement.employeeManagement.enumModel.Role;
 import com.employeeManagement.employeeManagement.model.Employee;
 import com.employeeManagement.employeeManagement.model.Project;
 import com.employeeManagement.employeeManagement.repository.EmployeeRepository;
 import com.employeeManagement.employeeManagement.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +48,10 @@ public class EmployeeServiceImpl implements EmployeeService{
     @Override
     public List<Long> deleteEmployee(Long id) {
         Employee employeeFounded=employeeRepository.getReferenceById(id);
-        List<Project> projects=projectRepository.findByEmployee(employeeFounded);
+        List<Project> employeeProjects = projectRepository.findByEmployee(employeeFounded);
+        List<Project> managerProjects = projectRepository.findByManagerId(employeeFounded);
+        employeeProjects.addAll(managerProjects);
+        List<Project> projects = employeeProjects;
         List<Long> projectIds = projects.stream()
                 .map(Project::getId)
                 .collect(Collectors.toList());
@@ -64,6 +69,12 @@ public class EmployeeServiceImpl implements EmployeeService{
             employeeResponse.setLastName(employee.getLastName());
             employeeResponse.setEmail(employee.getEmail());
             employeeResponse.setRole(employee.getRole());
+            List<String> projectTitles = employee.getProject().stream()
+                    .map(Project::getTitle)
+                    .collect(Collectors.toList());
+
+            employeeResponse.setProjectTitles(projectTitles);
+
             employeeResponses.add(employeeResponse);
         }
         return employeeResponses;
@@ -79,7 +90,20 @@ public class EmployeeServiceImpl implements EmployeeService{
             employeeResponse.setLastName(employee.get().getLastName());
             employeeResponse.setEmail(employee.get().getEmail());
             employeeResponse.setRole(employee.get().getRole());
+            List<String> projectTitles = employee.get().getProject().stream()
+                    .map(Project::getTitle)
+                    .collect(Collectors.toList());
+
+            employeeResponse.setProjectTitles(projectTitles);
         }
         return employeeResponse;
+    }
+
+    @Override
+    public ResponseEntity<EmployeeResponse> saveEmployee(Employee saveEmployee) {
+        saveEmployee.setPassword(passwordEncoder.encode(saveEmployee.getPassword()));
+        saveEmployee.setRole(Role.USER);
+        Employee employee= employeeRepository.save(saveEmployee);
+        return ResponseEntity.ok(getEmployeeById(employee.getId()));
     }
 }

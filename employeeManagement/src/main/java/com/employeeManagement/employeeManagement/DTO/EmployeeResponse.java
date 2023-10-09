@@ -2,12 +2,17 @@ package com.employeeManagement.employeeManagement.DTO;
 
 import com.employeeManagement.employeeManagement.enumModel.Role;
 
+import java.util.List;
+
 public class EmployeeResponse {
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
     private Role role;
+
+    private List<String> projectTitles;
+
 
     public EmployeeResponse(long id, String firstName, String lastName, String email, Role role) {
         this.id=id;
@@ -56,5 +61,13 @@ public class EmployeeResponse {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public List<String> getProjectTitles() {
+        return projectTitles;
+    }
+
+    public void setProjectTitles(List<String> projectTitles) {
+        this.projectTitles = projectTitles;
     }
 }

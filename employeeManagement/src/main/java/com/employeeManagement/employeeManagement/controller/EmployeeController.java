@@ -127,10 +127,7 @@ public class EmployeeController {
     @PostMapping
     @Hidden
     public ResponseEntity<EmployeeResponse> saveEmployee(@Valid @RequestBody Employee saveEmployee){
-        saveEmployee.setPassword(passwordEncoder.encode(saveEmployee.getPassword()));
-        saveEmployee.setRole(Role.USER);
-        Employee employee= employeeRepository.save(saveEmployee);
-        return ResponseEntity.ok(employeeService.getEmployeeById(employee.getId()));
+        return employeeService.saveEmployee(saveEmployee);
     }
 
 
@@ -154,7 +151,7 @@ public class EmployeeController {
     )
     @PreAuthorize("(hasAuthority('ADMIN') or (hasAuthority('USER') and principal.username==@authenticationService.userNameForId(#id)))")
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateProject(@PathVariable Long id,@Valid @RequestBody Employee updateEmployee) {
+    public ResponseEntity<String> updateEmployee(@PathVariable Long id,@Valid @RequestBody Employee updateEmployee) {
         String role="USER";
         Optional<Employee> employeePresent = employeeRepository.findById(id);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -209,7 +206,8 @@ public class EmployeeController {
                 return ResponseEntity.ok("Employee with Id {"+id+"} deleted");
             }
             else {
-                throw new ExceptionUtils.EmployeeIsAssignedException("The employee is assigned to projects"+projectIds+".So remove employee with id{"+id+"} from projects"+projectIds+".");
+                throw new ExceptionUtils.EmployeeIsAssignedException("The employee part of" +
+                        " projects"+projectIds+".So remove employee with id{"+id+"} from projects"+projectIds+".");
             }
         }
         else {
