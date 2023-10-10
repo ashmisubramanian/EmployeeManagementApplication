@@ -82,21 +82,27 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     @Override
     public EmployeeResponse getEmployeeById(Long id) {
-        Optional<Employee> employee=employeeRepository.findById(id);
-        EmployeeResponse employeeResponse=new EmployeeResponse();
-        if(employee.isPresent()){
+        Optional<Employee> employee = employeeRepository.findById(id);
+        EmployeeResponse employeeResponse = new EmployeeResponse();
+
+        if (employee.isPresent()) {
             employeeResponse.setId(employee.get().getId());
             employeeResponse.setFirstName(employee.get().getFirstName());
             employeeResponse.setLastName(employee.get().getLastName());
             employeeResponse.setEmail(employee.get().getEmail());
             employeeResponse.setRole(employee.get().getRole());
-            List<String> projectTitles = employee.get().getProject().stream()
+
+            List<String> projectTitles = employee.get().getProject() != null
+                    ? employee.get().getProject().stream()
                     .map(Project::getTitle)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList())
+                    : new ArrayList<>(); // Handle the case where the project list is null
 
             employeeResponse.setProjectTitles(projectTitles);
         }
+
         return employeeResponse;
+
     }
 
     @Override
